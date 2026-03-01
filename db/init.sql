@@ -13,7 +13,19 @@ CREATE TABLE IF NOT EXISTS profiles (
     ama_enabled               BOOLEAN DEFAULT FALSE,
     raw                       JSONB,
     scraped_at                TIMESTAMPTZ DEFAULT NOW(),
-    updated_at                TIMESTAMPTZ DEFAULT NOW()
+    updated_at                TIMESTAMPTZ DEFAULT NOW(),
+    bio                       TEXT,
+    short_bio                 VARCHAR(255),
+    city                      VARCHAR(255),
+    country                   VARCHAR(255),
+    skills                    JSONB,
+    social_links              JSONB,
+    experiences               JSONB,
+    projects                  JSONB,
+    github_stats              JSONB,
+    prize_winnings_amount     NUMERIC,
+    enriched_at               TIMESTAMPTZ,
+    enrichment_status         VARCHAR(20) DEFAULT 'pending'
 );
 
 CREATE INDEX IF NOT EXISTS idx_profiles_uuid     ON profiles(uuid);
