@@ -18,7 +18,8 @@ def load_data():
             total_hackathons_attended, total_hackathons_won,
             total_projects, total_merits, total_funding_received,
             ama_enabled,
-            city, country, skills, github_stats, bio, enrichment_status
+            city, country, skills, github_stats, bio, enrichment_status,
+            social_links
         FROM profiles
     """)
     rows = cur.fetchall()
@@ -47,6 +48,16 @@ def load_data():
     df['github_followers'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'followers'))
     df['github_repos'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'repositories'))
     df['github_stars'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'stars'))
+    
+    def extract_social(row, key):
+        if isinstance(row, dict):
+            return row.get(key)
+        return None
+        
+    df['github_url'] = df['social_links'].apply(lambda x: extract_social(x, 'github'))
+    df['linkedin_url'] = df['social_links'].apply(lambda x: extract_social(x, 'linkedin'))
+    df['twitter_url'] = df['social_links'].apply(lambda x: extract_social(x, 'twitter'))
+    df['website_url'] = df['social_links'].apply(lambda x: extract_social(x, 'website'))
     
     # Prepare searchable strings for multi-selects
     df['city'] = df['city'].fillna('Unknown')
@@ -128,7 +139,8 @@ display_cols = [
     'profile_link', 'username', 'first_name', 'last_name', 
     'skills', 'city', 'country',
     'total_projects', 'total_hackathons_won', 
-    'github_followers', 'github_stars', 'github_repos'
+    'github_followers', 'github_stars', 'github_repos',
+    'github_url', 'linkedin_url', 'twitter_url', 'website_url'
 ]
 
 st.dataframe(
@@ -148,5 +160,9 @@ st.dataframe(
         "github_followers": st.column_config.NumberColumn("GitHub Followers", format="%d"),
         "github_stars": st.column_config.NumberColumn("GitHub Stars", format="%d"),
         "github_repos": st.column_config.NumberColumn("GitHub Repos", format="%d"),
+        "github_url": st.column_config.LinkColumn("GitHub Profile"),
+        "linkedin_url": st.column_config.LinkColumn("LinkedIn"),
+        "twitter_url": st.column_config.LinkColumn("Twitter"),
+        "website_url": st.column_config.LinkColumn("Website"),
     }
 )
