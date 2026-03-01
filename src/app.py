@@ -42,16 +42,20 @@ def load_data():
     
     def extract_github_stat(row, stat_key):
         if isinstance(row, dict):
-            return row.get(stat_key, 0)
+            val = row.get(stat_key)
+            if isinstance(val, dict):
+                return int(val.get('totalCount', 0))
+            return int(val) if val is not None else 0
         return 0
         
-    df['github_followers'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'followers'))
-    df['github_repos'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'repositories'))
-    df['github_stars'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'stars'))
+    df['github_followers'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'followers')).astype(int)
+    df['github_repos'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'repositories')).astype(int)
+    df['github_stars'] = df['github_stats'].apply(lambda x: extract_github_stat(x, 'totalStars')).astype(int)
     
     def extract_social(row, key):
         if isinstance(row, dict):
-            return row.get(key)
+            val = row.get(key)
+            return str(val) if val else None
         return None
         
     df['github_url'] = df['social_links'].apply(lambda x: extract_social(x, 'github'))
